@@ -4,7 +4,7 @@
 # A script for building a one-file static website
 
 # Maintainer:       Ben Buchanan
-# Version:          0.6.0
+# Version:          1.0.0
 # Last Modified:    19-Oct-2025
 
 TOTEM_ENV=totem.env

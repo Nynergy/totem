@@ -15,7 +15,7 @@ I stumbled across [this site](https://john-doe.neocities.org/) and thought,
 "hey, I want to do that." But I'm a weirdo who programs for fun, so I'm gonna do
 it _my_ way.
 
-Which how I ended up with yet another over-engineered bash script to do
+Which is how I ended up with yet another over-engineered bash script to do
 something that should probably be done by hand anyway.
 
 ## How is it?
@@ -36,7 +36,7 @@ that doesn't reload the page whenever you click on an internal link.
 Yes.
 
 ```shell
-$ git clone https://github.com/Nynergy/totem
+$ git clone https://github.com/Nynergy/totem.git
 $ cd totem
 $ ./totem
 ```

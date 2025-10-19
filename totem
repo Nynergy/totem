@@ -1,0 +1,350 @@
+#!/usr/bin/env bash
+
+# 'totem'
+# A script for building a one-file static website
+
+# Maintainer:       Ben Buchanan
+# Version:          0.6.0
+# Last Modified:    19-Oct-2025
+
+TOTEM_ENV=totem.env
+
+[ -f "$TOTEM_ENV" ] || {
+    echo "Please provide a '$TOTEM_ENV' file"
+    exit 1
+}
+
+# shellcheck source=/dev/null
+source "$TOTEM_ENV"
+
+PARTS_DIR="${PARTS_DIR:-_parts}"
+PAGES_DIR="${PAGES_DIR:-_pages}"
+POSTS_DIR="${POSTS_DIR:-_posts}"
+
+STYLE_DIR="${STYLE_DIR:-_style}"
+STYLE_FILE="${STYLE_FILE:-style.css}"
+STYLESHEET="$STYLE_DIR"/"$STYLE_FILE"
+
+STATIC_DIR="${STATIC_DIR:-_static}"
+
+FAVICON_FILE="${FAVICON_FILE:-favicon.ico}"
+FAVICON="$STATIC_DIR"/"$FAVICON_FILE"
+
+BUILD_DIR="${BUILD_DIR:-_build}"
+BUILD_FILE="${BUILD_FILE:-index.html}"
+BUILD="$BUILD_DIR"/"$BUILD_FILE"
+
+RSS_FILE="${RSS_FILE:-rss.xml}"
+RSS="$BUILD_DIR"/"$RSS_FILE"
+
+SITE_DIR="${SITE_DIR:-_site}"
+
+[ -v SITE_TITLE ] || {
+    echo "Please provide a 'SITE_TITLE' in '$TOTEM_ENV'"
+    exit 1
+}
+[ -v SITE_BASE_URL ] || {
+    echo "Please provide a 'SITE_BASE_URL' in '$TOTEM_ENV'"
+    exit 1
+}
+[ -v SITE_DESCRIPTION ] || {
+    echo "Please provide a 'SITE_DESCRIPTION' in '$TOTEM_ENV'"
+    exit 1
+}
+
+output() {
+    local string=$1
+    local dest=${2:-$BUILD}
+    echo "$string" >> "$dest"
+}
+
+output_content() {
+    local filepath=$1
+    local dirname="${filepath%%/*}"
+    local page_id="${filepath#*/}"
+    page_id="${page_id%.*}"
+    local page_class="${page_id%%/*}"
+
+    [ -f "$filepath" ] && {
+        [ "$dirname" == "$PAGES_DIR" ] && \
+            output "<section id=\"$page_id\" class=\"$page_class\">"
+
+        output "$(<"$filepath")"
+
+        [ "$dirname" == "$PAGES_DIR" ] && \
+            output '</section>'
+    }
+}
+
+interpolate() {
+    local pattern=$1
+    local replacement=$2
+    local num_replace=${3:-all}
+
+    local temp
+    temp="$(<"$BUILD")"
+    case $num_replace in
+        once)
+            temp="${temp/$pattern/$replacement}" ;;
+        all)
+            temp="${temp//$pattern/$replacement}" ;;
+    esac
+    echo "$temp" > "$BUILD"
+}
+
+format_date() {
+    local -n ptr=${1}
+    local fmt=$2
+
+    printf -v ptr "%($fmt)T\\n" "-1"
+}
+
+write_head() {
+    output_content "$PARTS_DIR/head.html"
+}
+
+write_body() {
+    output '<body>'
+
+    output '<aside>'
+    output_content "$PARTS_DIR/header.html"
+    output_content "$PARTS_DIR/footer.html"
+    output '</aside>'
+
+    write_main
+
+    output '</body>'
+}
+
+write_main() {
+    output '<main>'
+
+    [ -d "$PAGES_DIR" ] && write_pages
+    [ -d "$POSTS_DIR" ] && write_posts
+    write_galleries
+
+    output '</main>'
+}
+
+parse_post_date() {
+    local -n ptr=${1}
+
+    ptr="${ptr%% *}"
+    ptr="${ptr//-/\/}"
+}
+
+parse_post_title() {
+    local -n ptr=${1}
+
+    ptr="${post#* }"
+    ptr="${post_title%.*}"
+}
+
+parse_post_href() {
+    local -n ptr=${1}
+    local post_date post_title
+
+    post_date="$ptr" && parse_post_date post_date
+    post_title="$ptr" && parse_post_title post_title
+    ptr="blog/$post_date/$post_title"
+}
+
+write_posts() {
+    # Iterate over posts in reverse
+    # This puts most recent posts at the top
+    local posts=("$POSTS_DIR"/*.html)
+    local post post_date post_title post_href post_content post_string
+
+    local post_list=''
+    local i
+    for ((i=${#posts[@]}-1; i >= 0; --i)); {
+        post="${posts[$i]##*/}"
+        post_content="$(<"${posts[$i]}")"
+        post_content="${post_content//\&/\\&}"
+        post_date="$post" && parse_post_date post_date
+        post_title="$post" && parse_post_title post_title
+        post_href="$post" && parse_post_href post_href
+
+        # Output the actual post page
+        output "<section id=\"$post_href\" class=\"blog\">"
+
+        post_string="$(<"$PARTS_DIR/post.html")"
+        post_string="${post_string//\{POST_TITLE\}/$post_title}"
+        post_string="${post_string//\{POST_DATE\}/$post_date}"
+        post_string="${post_string//\{POST_CONTENT\}/$post_content}"
+
+        output "$post_string"
+
+        output '</section>'
+
+        # Add the post to the post list
+        post_list+='<div>'
+        post_list+="<a href=\"#$post_href\">"
+        post_list+="<h3>$post_title</h3>"
+        post_list+='</a>'
+        post_list+="<small>Posted on $post_date</small>"
+        post_list+='</div>'
+    }
+
+    interpolate '{BLOG_POST_LIST}' "$post_list"
+}
+
+write_pages() {
+    local page
+    for page in "$PAGES_DIR"/**/*.html; {
+        output_content "$page"
+    }
+}
+
+write_galleries() {
+    local gallery images image image_href
+    for gallery in "$STATIC_DIR"/artwork/*; {
+        [ -d "$gallery" ] || continue
+
+        images=''
+        for image in "$gallery"/*.jpg; {
+            image_href="${image#*/}"
+
+            images+="<a href=\"#$image_href\">"
+            images+="<img src=\"${image:1}\" />"
+            images+='</a>'
+        }
+
+        interpolate '{GALLERY_IMAGES}' "$images" once
+
+        output '</section>'
+    }
+}
+
+write_image_lightboxes() {
+    local image extension image_id origin
+    for image in "$STATIC_DIR"/artwork/**/*; {
+        extension="${image##*.}"
+
+        case $extension in
+            jpg|png)
+                image_id="${image#*/}" ;
+                origin="${image_id%/*}" ;
+                [[ $origin != *.* ]] && {
+                    write_lightbox "${image:1}" "$image_id" "$origin"
+                } ;;
+            *)
+                ;;
+        esac
+    }
+}
+
+write_lightbox() {
+    local image_src=$1
+    local image_id=$2
+    local origin=$3
+
+    output "<a id=\"$image_id\" class=\"lightbox\" href=\"#$origin\">"
+    output "<img src=\"$image_src\" />"
+    output '</a>'
+}
+
+make_images_lazy() {
+    interpolate '<img ' '<img loading="lazy" '
+}
+
+modify_external_links() {
+    check_for_unmarked_external_links
+    interpolate '{EXT_LINK}' 'target="_blank" rel="noopener noreferrer"'
+}
+
+check_for_unmarked_external_links() {
+    local line
+    while read -r line; do
+        [[ $line =~ \<a\ *href=(\".*//.*\")\ *\> ]] && {
+            echo "External link ${BASH_REMATCH[1]} has no {EXT_LINK} mark"
+        }
+    done < "$BUILD"
+}
+
+interpolate_site_data() {
+    interpolate '{SITE_TITLE}' "$SITE_TITLE"
+    interpolate '{SITE_DESCRIPTION}' "$SITE_DESCRIPTION"
+
+    interpolate '{STYLE_PATH}' "${STYLESHEET:1}"
+    interpolate '{FAVICON_PATH}' "${FAVICON:1}"
+}
+
+interpolate_dates() {
+    local copyright_year && format_date copyright_year '%Y'
+    interpolate '{COPYRIGHT_YEAR}' "$copyright_year"
+
+    local modification_date && format_date modification_date '%B %d, %Y'
+    interpolate '{MODIFICATION_DATE}' "$modification_date"
+}
+
+write_rss_feed() {
+    local posts=("$POSTS_DIR"/*.html)
+    local post post_title post_href post_date
+
+    output '<?xml version="1.0" encoding="UTF-8" ?>' "$RSS"
+    output '<rss version="2.0">' "$RSS"
+
+    output '<channel>' "$RSS"
+
+    output "<title>$SITE_TITLE</title>" "$RSS"
+    output "<link>$SITE_BASE_URL</link>" "$RSS"
+    output "<description>$SITE_DESCRIPTION</description>" "$RSS"
+
+    # Iterate over posts in reverse
+    # This puts most recent posts at the top
+    local i
+    for ((i=${#posts[@]}-1; i >= 0; --i)); {
+        post="${posts[$i]##*/}"
+        post_date="$post" && parse_post_date post_date
+        post_title="$post" && parse_post_title post_title
+        post_href="$post" && parse_post_href post_href
+
+        output '<item>' "$RSS"
+        output "<title>$post_title</title>" "$RSS"
+        output "<link>$SITE_BASE_URL/#$post_href</link>" "$RSS"
+        output "<description>$post_date - Blog Post</description>" "$RSS"
+        output '</item>'
+    }
+
+    output '</channel>' "$RSS"
+
+    output '</rss>' "$RSS"
+}
+
+migrate_dir() {
+    local dir=$1
+    local dest=$1
+
+    [[ $dest == _* ]] && dest="${dest:1}"
+
+    [ -d "$dir" ] && cp -r "$dir" "$BUILD_DIR/$dest"
+}
+
+shopt -s globstar nullglob
+
+mkdir -p "$BUILD_DIR"
+
+output '<!DOCTYPE html>'
+output '<html lang="en">'
+write_head
+write_body
+output '</html>'
+
+write_image_lightboxes
+make_images_lazy
+
+modify_external_links
+
+interpolate_site_data
+interpolate_dates
+
+write_rss_feed
+
+migrate_dir "$STYLE_DIR"
+migrate_dir "$STATIC_DIR"
+
+rm -rf "$SITE_DIR"
+mv "$BUILD_DIR" "$SITE_DIR"
+
+shopt -u globstar nullglob

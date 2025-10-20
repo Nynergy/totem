@@ -1,0 +1,48 @@
+<p>
+You can use inline footnotes to hide information from the reader unless they
+click on the little footnote superscript indicator. They look like this.
+<label for="2025-10-30-fn-1">*</label>
+<input id="2025-10-30-fn-1" type="checkbox"></input>
+<small>Now you can read this information. Click the indicator again to hide it.</small>
+</p>
+
+<p>
+You can use footnotes to stow away extra text, or any arbitrary HTML you want
+to throw in there as well.
+</p>
+
+<h3>A Note About External Links</h3>
+
+<p>
+If you include links to external sites in your website, then <em>totem</em> will
+expect you to "mark" them as external. What you should do is the following:
+</p>
+
+<code>&lt;a href="https://example.com"&gt;Link Text&lt;/a&gt;</code>
+
+<p>
+Should become:
+</p>
+
+<code>&lt;a { EXT_LINK } href="https://example.com"&gt;Link Text&lt;/a&gt;</code>
+
+<p>
+Except, you don't want those spaces between the curly braces ({,}) and the EXT_LINK.
+I'm just doing that here otherwise it will get replaced when I render this post.
+</p>
+
+<p>
+During the build process, that marker will be replaced with
+<code class="inline">target="_blank" rel="noopener noreferrer"</code>
+which guarantees that the link will open in a new tab instead of the current one.
+</p>
+
+<p>
+You can test it out by following <a {EXT_LINK} href="https://example.com">this link</a>.
+</p>
+
+<p>
+<b>NOTE:</b> If you forget to include the EXT_LINK marker, <em>totem</em> will
+complain about that specific link during the build process, so you can go find
+it and add the EXT_LINK marker.
+</p>

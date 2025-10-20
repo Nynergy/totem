@@ -1,0 +1,259 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <title>Locus Temporarius</title>
+
+    <link rel="stylesheet" href="style/style.css">
+    <link rel="icon" href="static/favicon.ico" type="image/x-icon">
+
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="description" content="An example site for totem">
+</head>
+<body>
+<aside>
+<header>
+    <div>
+        <div>
+            <h1><a href="#home">Locus Temporarius</a></h1>
+            <small>An example site for totem</small>
+        </div>
+        <img loading="lazy" src="static/logo.jpg" />
+    </div>
+
+    <hr>
+
+    <nav>
+        <a href="#home">Home</a>
+        <a href="#blog">Blog</a>
+        <a href="#artwork">Artwork</a>
+    </nav>
+</header>
+<footer>
+    <small>Copyright &copy; 2025
+ Locus Temporarius</small>
+    <small>Built with <a target="_blank" rel="noopener noreferrer" href="https://github.com/Nynergy/totem">totem</a></small>
+    <small>Last Update: October 20, 2025
+</small>
+</footer>
+</aside>
+<main>
+<section id="artwork" class="artwork">
+<h2>Artwork</h2>
+
+<p>
+This is where you can put a description or other arbitrary HTML for the image
+gallery. Click on an individual image to show a lightbox of it.
+</p>
+
+<hr>
+
+<div class="gallery">
+    <a href="#artwork/1920x1080.jpg"><img loading="lazy" src="static/artwork/1920x1080.jpg" /></a><a href="#artwork/2000x1500.jpg"><img loading="lazy" src="static/artwork/2000x1500.jpg" /></a><a href="#artwork/2000x2000.jpg"><img loading="lazy" src="static/artwork/2000x2000.jpg" /></a><a href="#artwork/3000x4000.jpg"><img loading="lazy" src="static/artwork/3000x4000.jpg" /></a><a href="#artwork/4000x3000.jpg"><img loading="lazy" src="static/artwork/4000x3000.jpg" /></a><a href="#artwork/500x500.jpg"><img loading="lazy" src="static/artwork/500x500.jpg" /></a><a href="#artwork/5678x1234.jpg"><img loading="lazy" src="static/artwork/5678x1234.jpg" /></a><a href="#artwork/600x800.jpg"><img loading="lazy" src="static/artwork/600x800.jpg" /></a><a href="#artwork/800x600.jpg"><img loading="lazy" src="static/artwork/800x600.jpg" /></a>
+</div>
+</section>
+<section id="blog" class="blog">
+<h2>Blog</h2>
+
+<div class="card-list">
+    <div><a href="#blog/2025/10/30/Inline Footnotes and External Links"><h3>Inline Footnotes and External Links</h3></a><small>Posted on 2025/10/30</small></div><div><a href="#blog/2025/09/08/On Images in Blog Posts"><h3>On Images in Blog Posts</h3></a><small>Posted on 2025/09/08</small></div><div><a href="#blog/2025/08/23/The First Blog Post"><h3>The First Blog Post</h3></a><small>Posted on 2025/08/23</small></div>
+</div>
+</section>
+<section id="home" class="home">
+<h2>Home</h2>
+
+<img loading="lazy" class="masthead" src="https://dummyimage.com/1000x100/4d5152/c3d4ce.jpg" />
+
+<p>
+<b><em>Locus Temporarius</em></b> is an example website built with <em>totem</em>.
+</p>
+
+<h3>Things To Do Here</h3>
+
+<p>
+Click on links. Follow them. Explore the site.
+</p>
+
+<p>
+If you want to know why something is styled the way it is, take a look at the
+file <code class="inline">_style/style.css</code> and make changes if desired.
+</p>
+
+<p>
+Pay special attention to the following CSS:
+</p>
+
+<code>section,
+section:target ~ #home,
+#home:has(~ section:target) {
+    display: none;
+}
+
+#home, section:target {
+    display: block;
+}
+</code>
+
+<p>
+This is what allows the site to show/hide pages based on what the user has
+selected. Removing it may lead to unintended site behavior.
+</p>
+</section>
+<section id="blog/2025/10/30/Inline Footnotes and External Links" class="blog">
+<div class="post__header">
+    <h2>Inline Footnotes and External Links</h2>
+    <small>Posted on 2025/10/30</small>
+</div>
+
+<div class="content">
+    <p>
+You can use inline footnotes to hide information from the reader unless they
+click on the little footnote superscript indicator. They look like this.
+<label for="2025-10-30-fn-1">*</label>
+<input id="2025-10-30-fn-1" type="checkbox"></input>
+<small>Now you can read this information. Click the indicator again to hide it.</small>
+</p>
+
+<p>
+You can use footnotes to stow away extra text, or any arbitrary HTML you want
+to throw in there as well.
+</p>
+
+<h3>A Note About External Links</h3>
+
+<p>
+If you include links to external sites in your website, then <em>totem</em> will
+expect you to "mark" them as external. What you should do is the following:
+</p>
+
+<code>&lt;a href="https://example.com"&gt;Link Text&lt;/a&gt;</code>
+
+<p>
+Should become:
+</p>
+
+<code>&lt;a { EXT_LINK } href="https://example.com"&gt;Link Text&lt;/a&gt;</code>
+
+<p>
+Except, you don't want those spaces between the curly braces ({,}) and the EXT_LINK.
+I'm just doing that here otherwise it will get replaced when I render this post.
+</p>
+
+<p>
+During the build process, that marker will be replaced with
+<code class="inline">target="_blank" rel="noopener noreferrer"</code>
+which guarantees that the link will open in a new tab instead of the current one.
+</p>
+
+<p>
+You can test it out by following <a target="_blank" rel="noopener noreferrer" href="https://example.com">this link</a>.
+</p>
+
+<p>
+<b>NOTE:</b> If you forget to include the EXT_LINK marker, <em>totem</em> will
+complain about that specific link during the build process, so you can go find
+it and add the EXT_LINK marker.
+</p>
+</div>
+</section>
+<section id="blog/2025/09/08/On Images in Blog Posts" class="blog">
+<div class="post__header">
+    <h2>On Images in Blog Posts</h2>
+    <small>Posted on 2025/09/08</small>
+</div>
+
+<div class="content">
+    <p>
+You can include images in blog posts, either on their own, or within a
+<code class="inline">figure</code> tag so that you can include a caption.
+</p>
+
+<img loading="lazy" src="https://dummyimage.com/600x400/c3cfc9/313833.jpg" />
+
+<figure>
+    <img loading="lazy" src="https://dummyimage.com/400x600/c3cfc9/313833.jpg" />
+</figure>
+
+<figure>
+    <img loading="lazy" src="https://dummyimage.com/200x200/c3cfc9/313833.jpg" />
+    <figcaption>This image has a caption</figcaption>
+</figure>
+
+<h3>A Note About Lazy Images</h3>
+
+<p>
+In order to make loading the site easier, <em>totem</em> will automatically
+add the <code class="inline">loading="lazy"</code> attribute to all images it
+comes across during the build process.
+</p>
+</div>
+</section>
+<section id="blog/2025/08/23/The First Blog Post" class="blog">
+<div class="post__header">
+    <h2>The First Blog Post</h2>
+    <small>Posted on 2025/08/23</small>
+</div>
+
+<div class="content">
+    <p>
+This is the first blog post. You can put whatever content you want in here.
+</p>
+
+<ul>
+    <li>Paragraphs of text</li>
+    <li>Lists of various items</li>
+    <li>Images with captions</li>
+    <li>Inline footnotes</li>
+    <li>Whatever else you feel like</li>
+</ul>
+
+<p>
+Take a look at other blog posts and you'll see examples of the things listed above.
+</p>
+
+<h3>A Note About Filenames</h3>
+
+<p>
+<em>totem</em> expects the blog post filenames to be in a specific format. It
+uses this format to determine what the associated title and date of the post is.
+The format is as follows:
+</p>
+
+<code>YYYY-MM-DD Arbitrary Post Title.html</code>
+
+<p>
+In plain English, the filename must start with a date in YYY-MM-DD format, such
+as 2024-06-12, then contain a space, then you can use whatever title you want.
+</p>
+</div>
+</section>
+</main>
+</body>
+</html>
+<a id="artwork/1920x1080.jpg" class="lightbox" href="#artwork">
+<img loading="lazy" src="static/artwork/1920x1080.jpg" />
+</a>
+<a id="artwork/2000x1500.jpg" class="lightbox" href="#artwork">
+<img loading="lazy" src="static/artwork/2000x1500.jpg" />
+</a>
+<a id="artwork/2000x2000.jpg" class="lightbox" href="#artwork">
+<img loading="lazy" src="static/artwork/2000x2000.jpg" />
+</a>
+<a id="artwork/3000x4000.jpg" class="lightbox" href="#artwork">
+<img loading="lazy" src="static/artwork/3000x4000.jpg" />
+</a>
+<a id="artwork/4000x3000.jpg" class="lightbox" href="#artwork">
+<img loading="lazy" src="static/artwork/4000x3000.jpg" />
+</a>
+<a id="artwork/500x500.jpg" class="lightbox" href="#artwork">
+<img loading="lazy" src="static/artwork/500x500.jpg" />
+</a>
+<a id="artwork/5678x1234.jpg" class="lightbox" href="#artwork">
+<img loading="lazy" src="static/artwork/5678x1234.jpg" />
+</a>
+<a id="artwork/600x800.jpg" class="lightbox" href="#artwork">
+<img loading="lazy" src="static/artwork/600x800.jpg" />
+</a>
+<a id="artwork/800x600.jpg" class="lightbox" href="#artwork">
+<img loading="lazy" src="static/artwork/800x600.jpg" />
+</a>

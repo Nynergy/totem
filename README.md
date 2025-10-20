@@ -53,6 +53,21 @@ also tell you what folders _totem_ expects to find.
 Feel free to comment out or modify anything that your site doesn't need, or add
 stuff that you want. Then, start filling your folders with content.
 
+## But Can I, Really?
+
+Yes.
+
+From within the root directory of this repo:
+
+```shell
+$ cd example
+$ ../totem
+```
+
+This will build the example site included the repo. You can then open the
+generated `index.html` file in your browser to take a look around and read up a
+bit on the inner workings of _totem_.
+
 ## Cool
 
 cool.

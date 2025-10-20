@@ -4,8 +4,8 @@
 # A script for building a one-file static website
 
 # Maintainer:       Ben Buchanan
-# Version:          1.0.1
-# Last Modified:    19-Oct-2025
+# Version:          1.0.4
+# Last Modified:    20-Oct-2025
 
 TOTEM_ENV=totem.env
 
@@ -160,7 +160,6 @@ write_posts() {
     for ((i=${#posts[@]}-1; i >= 0; --i)); {
         post="${posts[$i]##*/}"
         post_content="$(<"${posts[$i]}")"
-        post_content="${post_content//\&/\\&}"
         post_date="$post" && parse_post_date post_date
         post_title="$post" && parse_post_title post_title
         post_href="$post" && parse_post_href post_href
@@ -198,7 +197,10 @@ write_pages() {
 
 write_galleries() {
     local gallery images image image_href
+    local loose=()
     for gallery in "$STATIC_DIR"/artwork/*; {
+        [[ "$gallery" == *.jpg ]] && loose+=("$gallery")
+        [[ "$gallery" == *.png ]] && loose+=("$gallery")
         [ -d "$gallery" ] || continue
 
         images=''
@@ -211,9 +213,18 @@ write_galleries() {
         }
 
         interpolate '{GALLERY_IMAGES}' "$images" once
-
-        output '</section>'
     }
+
+    images=''
+    for image in "${loose[@]}"; {
+        image_href="${image#*/}"
+
+        images+="<a href=\"#$image_href\">"
+        images+="<img src=\"${image:1}\" />"
+        images+='</a>'
+    }
+
+    (( ${#loose[@]} != 0 )) && interpolate '{LOOSE_IMAGES}' "$images" once
 }
 
 write_image_lightboxes() {

@@ -1,0 +1,23 @@
+<p>
+You can include images in blog posts, either on their own, or within a
+<code class="inline">figure</code> tag so that you can include a caption.
+</p>
+
+<img src="https://dummyimage.com/600x400/c3cfc9/313833.jpg" />
+
+<figure>
+    <img src="https://dummyimage.com/400x600/c3cfc9/313833.jpg" />
+</figure>
+
+<figure>
+    <img src="https://dummyimage.com/200x200/c3cfc9/313833.jpg" />
+    <figcaption>This image has a caption</figcaption>
+</figure>
+
+<h3>A Note About Lazy Images</h3>
+
+<p>
+In order to make loading the site easier, <em>totem</em> will automatically
+add the <code class="inline">loading="lazy"</code> attribute to all images it
+comes across during the build process.
+</p>

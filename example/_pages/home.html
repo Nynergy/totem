@@ -1,0 +1,38 @@
+<h2>Home</h2>
+
+<img class="masthead" src="https://dummyimage.com/1000x100/4d5152/c3d4ce.jpg" />
+
+<p>
+<b><em>Locus Temporarius</em></b> is an example website built with <em>totem</em>.
+</p>
+
+<h3>Things To Do Here</h3>
+
+<p>
+Click on links. Follow them. Explore the site.
+</p>
+
+<p>
+If you want to know why something is styled the way it is, take a look at the
+file <code class="inline">_style/style.css</code> and make changes if desired.
+</p>
+
+<p>
+Pay special attention to the following CSS:
+</p>
+
+<code>section,
+section:target ~ #home,
+#home:has(~ section:target) {
+    display: none;
+}
+
+#home, section:target {
+    display: block;
+}
+</code>
+
+<p>
+This is what allows the site to show/hide pages based on what the user has
+selected. Removing it may lead to unintended site behavior.
+</p>

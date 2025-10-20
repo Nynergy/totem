@@ -1,0 +1,23 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<rss version="2.0">
+<channel>
+<title>Locus Temporarius</title>
+<link>https://locustemporarius.biz</link>
+<description>An example site for totem</description>
+<item>
+<title>Inline Footnotes and External Links</title>
+<link>https://locustemporarius.biz/#blog/2025/10/30/Inline Footnotes and External Links</link>
+<description>2025/10/30 - Blog Post</description>
+</item>
+<item>
+<title>On Images in Blog Posts</title>
+<link>https://locustemporarius.biz/#blog/2025/09/08/On Images in Blog Posts</link>
+<description>2025/09/08 - Blog Post</description>
+</item>
+<item>
+<title>The First Blog Post</title>
+<link>https://locustemporarius.biz/#blog/2025/08/23/The First Blog Post</link>
+<description>2025/08/23 - Blog Post</description>
+</item>
+</channel>
+</rss>

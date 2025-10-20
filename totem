@@ -4,7 +4,7 @@
 # A script for building a one-file static website
 
 # Maintainer:       Ben Buchanan
-# Version:          1.0.0
+# Version:          1.0.1
 # Last Modified:    19-Oct-2025
 
 TOTEM_ENV=totem.env
@@ -304,7 +304,7 @@ write_rss_feed() {
         output "<title>$post_title</title>" "$RSS"
         output "<link>$SITE_BASE_URL/#$post_href</link>" "$RSS"
         output "<description>$post_date - Blog Post</description>" "$RSS"
-        output '</item>'
+        output '</item>' "$RSS"
     }
 
     output '</channel>' "$RSS"

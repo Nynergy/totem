@@ -4,8 +4,33 @@
 # A script for building a one-file static website
 
 # Maintainer:       Ben Buchanan
-# Version:          1.0.4
-# Last Modified:    20-Oct-2025
+# Version:          1.1.0
+# Last Modified:    25-Oct-2025
+
+## Build a one-file static website
+##
+## Usage: $0 [OPTIONS]
+##
+## Options:
+##   -h     Show this usage output
+##   -v     Show the version of the script
+##   -d     Build the site in DRAFT mode
+
+SCRIPT="${BASH_SOURCE[0]##*/}"
+
+print_usage() {
+    while read -r line; do
+        [[ $line =~ ^##\ ?(.*)$ ]] &&
+            printf '%s\n' "${BASH_REMATCH[1]/\$0/$SCRIPT}"
+    done < "${BASH_SOURCE[0]}"
+}
+
+print_version() {
+    while read -r line; do
+        [[ $line =~ ^#\ Version:\ *(.*)$ ]] &&
+            printf '%s %s\n' "$SCRIPT" "${BASH_REMATCH[1]}"
+    done < "${BASH_SOURCE[0]}"
+}
 
 TOTEM_ENV=totem.env
 
@@ -149,6 +174,12 @@ parse_post_href() {
     ptr="blog/$post_date/$post_title"
 }
 
+escape_ampersands() {
+    local -n ptr=${1}
+
+    ptr="${ptr//\&/\\&}"
+}
+
 write_posts() {
     # Iterate over posts in reverse
     # This puts most recent posts at the top
@@ -159,7 +190,10 @@ write_posts() {
     local i
     for ((i=${#posts[@]}-1; i >= 0; --i)); {
         post="${posts[$i]##*/}"
-        post_content="$(<"${posts[$i]}")"
+
+        [[ "$post" == *DRAFT* && $DRAFT_MODE == 0 ]] && continue
+
+        post_content="$(<"${posts[$i]}")" && escape_ampersands post_content
         post_date="$post" && parse_post_date post_date
         post_title="$post" && parse_post_title post_title
         post_href="$post" && parse_post_href post_href
@@ -191,6 +225,7 @@ write_posts() {
 write_pages() {
     local page
     for page in "$PAGES_DIR"/**/*.html; {
+        [[ "$page" == *DRAFT* && $DRAFT_MODE == 0 ]] && continue
         output_content "$page"
     }
 }
@@ -199,6 +234,7 @@ write_galleries() {
     local gallery images image image_href
     local loose=()
     for gallery in "$STATIC_DIR"/artwork/*; {
+        [[ "$gallery" == *DRAFT* && $DRAFT_MODE == 0 ]] && continue
         [[ "$gallery" == *.jpg ]] && loose+=("$gallery")
         [[ "$gallery" == *.png ]] && loose+=("$gallery")
         [ -d "$gallery" ] || continue
@@ -230,6 +266,7 @@ write_galleries() {
 write_image_lightboxes() {
     local image extension image_id origin
     for image in "$STATIC_DIR"/artwork/**/*; {
+        [[ "$image" == *DRAFT* && $DRAFT_MODE == 0 ]] && continue
         extension="${image##*.}"
 
         case $extension in
@@ -307,6 +344,9 @@ write_rss_feed() {
     local i
     for ((i=${#posts[@]}-1; i >= 0; --i)); {
         post="${posts[$i]##*/}"
+
+        [[ "$post" == *DRAFT* && $DRAFT_MODE == 0 ]] && continue
+
         post_date="$post" && parse_post_date post_date
         post_title="$post" && parse_post_title post_title
         post_href="$post" && parse_post_href post_href
@@ -331,6 +371,24 @@ migrate_dir() {
 
     [ -d "$dir" ] && cp -r "$dir" "$BUILD_DIR/$dest"
 }
+
+OPTIND=1
+DRAFT_MODE=0
+
+while getopts "hvd" opt; do
+    case "$opt" in
+        h)
+            print_usage ;
+            exit 0 ;;
+        v)
+            print_version ;
+            exit 0 ;;
+        d)
+            DRAFT_MODE=1 ;;
+    esac
+done
+
+[ $DRAFT_MODE == 1 ] && echo "Building in DRAFT mode"
 
 shopt -s globstar nullglob
 

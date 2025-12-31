@@ -64,7 +64,7 @@ $ cd example
 $ ../totem
 ```
 
-This will build the example site included the repo. You can then open the
+This will build the example site included in the repo. You can then open the
 generated `index.html` file in your browser to take a look around and read up a
 bit on the inner workings of _totem_.
 

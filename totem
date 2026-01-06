@@ -4,8 +4,8 @@
 # A script for building a one-file static website
 
 # Maintainer:       Ben Buchanan
-# Version:          1.1.0
-# Last Modified:    25-Oct-2025
+# Version:          1.2.0
+# Last Modified:    06-Jan-2026
 
 ## Build a one-file static website
 ##
@@ -305,6 +305,7 @@ check_for_unmarked_external_links() {
     local line
     while read -r line; do
         [[ $line =~ \<a\ *href=(\".*//.*\")\ *\> ]] && {
+            [[ $line == *{IGNORE_EXT}* ]] && continue
             echo "External link ${BASH_REMATCH[1]} has no {EXT_LINK} mark"
         }
     done < "$BUILD"
